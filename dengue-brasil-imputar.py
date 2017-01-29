@@ -82,7 +82,45 @@ for estado in estados.uf:
 	# 2. taxa de obitos de dengue hemorragica
 
 	dfDengue['taxa_obito_hemorragica'] = 0.0
-	dfDengue.loc[(dfDengue.casos_hemorragica != 0), 'taxa_obito_hemorragica'] = \
+	dfDengue.loc[(dfDengue.casos_hemorragica != 0), 'taxa_obito_hemorragica'] =\
 		round_(dfDengue.obitos_hemorragica / dfDengue.casos_hemorragica, decimals=2)
+
+	# 3. imputacao de leitos por mil habitantes
+
+	# selecionar anos com taxa de leitos disponivel
+	q = """
+		SELECT * FROM dfDengue
+			WHERE uf = '{}'
+			AND (
+				ano = 1990 OR
+				ano = 1992 OR
+				ano = 1999 OR
+				ano = 2002 OR
+				ano = 2005 OR
+				ano = 2009
+				)
+		""".format(estado)
+
+	dadosUf = sqldf(q, globals())
+
+	m, b = linreg(dadosUf.ano, dadosUf.leitos_mil_hab)
+
+	# imputacao de dados de leitos nos anos faltantes
+	for a in [1991, 1993, 1994, 1995, 1996, 1997,\
+		1998, 2000, 2001, 2003, 2004, 2006, 2007,\
+		2008, 2009, 2010, 2011, 2012, 2013, 2014]:
+
+		dfDengue.loc[(dfDengue.ano == a) & (dfDengue.uf == estado), 'leitos_mil_hab'] =\
+			round_(m * a + b, decimals=2)
+
+	# geracao de grafico
+	yReg = m * dadosUf.ano + b
+	plot(dadosUf.ano, dadosUf.leitos_mil_hab, marker='o', markersize=10, color='#FF12A8', alpha=0.7)
+	plot(dadosUf.ano, yReg, color='black', linestyle='--', alpha=0.7)
+	title('{}: densidade de leitos'.format(estado))
+	xlabel('ano')
+	ylabel('leito/mil hab.')
+	savefig('graficos/{}-densidade-de-leitos.png'.format(estado))
+	clf()
 	
 dfDengue.to_csv('dados/dados-fixed.csv', index=False)
