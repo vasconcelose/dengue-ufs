@@ -4,6 +4,17 @@ from numpy import *
 from random import shuffle
 from os import *
 
+# calcula saida da rede
+def saida(x, w, l):
+	d = zeros((l, l))
+	for i in range(0, l):
+		for j in range(0, l):
+			d[i, j] = sqrt(sum(pow(x - w[i, j], 2)))
+	
+	i, j = unravel_index(d.argmin(), d.shape)
+
+	return (i, j)
+
 # atualiza valor de s
 def novos(so, epoca, ts):
 	return so * exp(- epoca / ts)
@@ -14,12 +25,8 @@ def novon(no, epoca, tn):
 
 # retorna a vizinhanca topologica baseada na matriz de
 # distancias d e no desvio padrao da gaussiana
-def viztopologica(d, s, l, dim):
-	h = zeros((l, l, dim))
-	for i in range(0, l):
-		for j in range(0, l):
-			h[i, j] = exp(- d[i, j]**2 /\
-				(2 * s**2) )
+def viztopologica(d, s):
+	h = exp(- d**2 / (2 * s**2) )
 
 	return h
 
@@ -33,17 +40,6 @@ def distancias(iMin, jMin, l, dim):
 				pow(j - jMin, 2))
 
 	return d
-
-
-# retorna indices do neuronio vencedor (menor argmin)
-def vencedor(x, w, l):
-	sqrDif = square(x - w)
-	v = zeros((l, l))
-	for i in range(0, l):
-		for j in range(0, l):
-			v[i, j] = sqrt(sqrDif[i, j].sum())
-	
-	return unravel_index(v.argmin(), v.shape)
 
 # coordena treinamento da som
 def treinar(x, so, no, ts, tn, l, dim, w, N):
@@ -64,11 +60,11 @@ def treinar(x, so, no, ts, tn, l, dim, w, N):
 				ex, nEx))
 
 			# competicao
-			iMin, jMin = vencedor(x[ex], w, l)
+			iMin, jMin = saida(x[ex], w, l)
 
 			# cooperacao
 			d = distancias(iMin, jMin, l, dim)
-			h = viztopologica(d, s, l, dim)
+			h = viztopologica(d, s)
 
 			# adaptacao
 			w = w + n * h * (x[ex] - w)
