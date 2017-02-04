@@ -1,0 +1,24 @@
+# calcular medias dos parametros
+# for i in range(0, len(anos)):
+# 	ano = anos.iloc[i].ano
+# 	dadosMedicos = dfDengue[dfDengue.ano == ano]\
+# 		[['medicos_mil_hab', 'uf']]
+# 	dadosMedicos = dadosMedicos.sort_values(by=['uf'])
+# 	x = asarray(range(0, len(dadosMedicos.uf))) * 1.5
+# 	bar(x, dadosMedicos.medicos_mil_hab, color='#B357FF', alpha=0.5)
+# 	media = mean(dadosMedicos.medicos_mil_hab)
+# 	desvio = std(dadosMedicos.medicos_mil_hab, ddof=1)
+# 	media = ones(len(x)) * media
+# 	desvio = ones(len(x)) * desvio
+# 	desvioMais = media + desvio
+# 	desvioMenos = media - desvio
+# 	plot(x, media, color='black', linestyle=':', alpha=0.7)
+# 	plot(x, desvioMais, color='red', linestyle=':', alpha=0.7)
+# 	plot(x, desvioMenos, color='red', linestyle=':', alpha=0.7)
+# 	xticks(x, asarray(dadosMedicos.uf), fontsize=10)
+# 	gca().set_ylim([0, 4.5])
+# 	title('{}: densidade de medicos por estado'.format(ano))
+# 	xlabel('estado')
+# 	ylabel('medico/mil hab.')
+# 	savefig('graficos/@densidade-de-medicos-{}.png'.format(ano))
+# 	clf()
