@@ -17,6 +17,9 @@ dfDengue = read_csv(csv)
 # todos os estados
 q = """
 	SELECT uf FROM dfDengue
+		WHERE
+			ano >= 1994 AND
+			ano <= 2013
 		GROUP BY uf
 	"""
 
@@ -38,6 +41,24 @@ for estado in estados.uf:
 		mean(dfDengue[dfDengue.uf == estado].leitos_mil_hab)
 	estados.loc[(estados.uf == estado), 'std_leitos'] =\
 		std(dfDengue[dfDengue.uf == estado].leitos_mil_hab, ddof=1)
+
+	# casos de dengue
+	estados.loc[(estados.uf == estado), 'media_dengue_cem_mil_hab'] =\
+		mean(dfDengue[dfDengue.uf == estado].dengue_cem_mil_hab)
+	estados.loc[(estados.uf == estado), 'std_dengue_cem_mil_hab'] =\
+		std(dfDengue[dfDengue.uf == estado].dengue_cem_mil_hab, ddof=1)
+
+	# casos de hemorragica
+	estados.loc[(estados.uf == estado), 'media_casos_hemorragica'] =\
+		mean(dfDengue[dfDengue.uf == estado].casos_hemorragica)
+	estados.loc[(estados.uf == estado), 'std_casos_hemorragica'] =\
+		std(dfDengue[dfDengue.uf == estado].casos_hemorragica, ddof=1)
+
+	# obitos hemorragica
+	estados.loc[(estados.uf == estado), 'media_obitos_hemorragica'] =\
+		mean(dfDengue[dfDengue.uf == estado].taxa_obito_hemorragica)
+	estados.loc[(estados.uf == estado), 'std_obitos_hemorragica'] =\
+		std(dfDengue[dfDengue.uf == estado].taxa_obito_hemorragica, ddof=1)
 
 # plots
 x = asarray(range(0, len(estados.uf))) * 1.5
@@ -62,4 +83,37 @@ title('media anual de densidade de leitos por estado com barras de erro')
 xlabel('estado')
 ylabel('leito/mil hab.')
 savefig('graficos/@error-bar-media-de-leitos-por-estado.png')
+clf()
+
+# errorbar para casos de dengue
+errorbar(x, estados.media_dengue_cem_mil_hab, yerr=estados.std_dengue_cem_mil_hab,\
+	fmt='o', markersize=10, color='#3AEF12', alpha=0.75)
+xticks(x, asarray(estados.uf))
+margins(0.05)
+title('media anual de taxa de casos de dengue com barras de erro')
+xlabel('estado')
+ylabel('casos de dengue/cem mil hab.')
+savefig('graficos/@error-bar-media-de-casos-de-dengue-por-estado.png')
+clf()
+
+# errorbar para casos de hemorragica
+errorbar(x, estados.media_casos_hemorragica, yerr=estados.std_casos_hemorragica,\
+	fmt='o', markersize=10, color='#3A12EF', alpha=0.75)
+xticks(x, asarray(estados.uf))
+margins(0.05)
+title('media anual de casos de dengue hemorragica por estado com barras de erro')
+xlabel('estado')
+ylabel('numero de casos de dengue hemorragica')
+savefig('graficos/@error-bar-casos-de-hemorragica-por-estado.png')
+clf()
+
+# errorbar para obitos hemorragica
+errorbar(x, estados.media_obitos_hemorragica, yerr=estados.std_obitos_hemorragica,\
+	fmt='o', markersize=10, color='black', alpha=0.75)
+xticks(x, asarray(estados.uf))
+margins(0.05)
+title('media anual de taxa de obito devido a dengue hemorragica por estado com barras de erro')
+xlabel('estado')
+ylabel('taxa de obito devido a dengue hemorragica')
+savefig('graficos/@error-bar-obitos-hemorragica-por-estado.png')
 clf()
