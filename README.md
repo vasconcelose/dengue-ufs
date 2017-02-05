@@ -1,5 +1,6 @@
 # dengue-ufs
 Arquivos utilizados para escrever a postagem "Brasil vs. dengue: estamos ganhando ou perdendo a briga?" no blog Edudatalab.
+
 Link para a postagem: https://edudatalab.wordpress.com/2017/02/05/brasil-vs-dengue-estamos-ganhando-ou-perdendo-a-briga/
 
 Arquivos:
@@ -13,5 +14,5 @@ Arquivos:
 * utilidades.py e utilidades.pyc: minha implementação de regressão linear
 * wrangle.py: análise exploratória
 
-> Eduardo Vasconcelos
+> Eduardo Vasconcelos<br>
 > eduardovasconcelos@usp.br
