@@ -145,6 +145,3 @@ for estado in estados.uf:
 	y = asarray(y)
 	m, b = linreg(x, y)
 	print('{}: m_hemorragica = {}'.format(estado, m))
-
-
-# estatisticas
