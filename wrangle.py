@@ -4,6 +4,9 @@ from pandas import *
 from numpy import *
 from pandasql import *
 from matplotlib.pyplot import *
+
+from utilidades import linreg
+
 import seaborn as sns
 
 # melhorar visual dos graficos
@@ -14,7 +17,7 @@ csv = 'dados/dados-fixed.csv'
 
 dfDengue = read_csv(csv)
 
-# todos os estados
+# lista de estados
 q = """
 	SELECT uf FROM dfDengue
 		WHERE
@@ -24,10 +27,8 @@ q = """
 	"""
 
 estados = sqldf(q, globals())
-estados['media_medicos'] = 0
-estados['std_medicos'] = 0
 
-# calculo de estatisticas
+# medias e desvios para graficos
 for estado in estados.uf:
 
 	# medicos
@@ -65,55 +66,85 @@ x = asarray(range(0, len(estados.uf))) * 1.5
 
 # errorbar para a densidade de medicos
 errorbar(x, estados.media_medicos, yerr=estados.std_medicos,\
-	fmt='o', markersize=10, color='#EB9F3B', alpha=0.75)
+	fmt='s', markersize=10, color='#347DEB', alpha=0.7)
 xticks(x, asarray(estados.uf))
 margins(0.05)
-title('media anual de densidade de medicos por estado com barras de erro')
+title('media anual de densidade de medicos')
 xlabel('estado')
 ylabel('medico/mil hab.')
-savefig('graficos/@error-bar-media-de-medicos-por-estado.png')
+savefig('graficos/@error-bar-media-medicos.png')
 clf()
 
 # errorbar para a densidade de leitos
 errorbar(x, estados.media_leitos, yerr=estados.std_leitos,\
-	fmt='o', markersize=10, color='#3B9FEB', alpha=0.75)
+	fmt='s', markersize=10, color='#124FEB', alpha=0.7)
 xticks(x, asarray(estados.uf))
 margins(0.05)
-title('media anual de densidade de leitos por estado com barras de erro')
+title('media anual de densidade de leitos')
 xlabel('estado')
 ylabel('leito/mil hab.')
-savefig('graficos/@error-bar-media-de-leitos-por-estado.png')
+savefig('graficos/@error-bar-media-leitos.png')
 clf()
 
 # errorbar para casos de dengue
 errorbar(x, estados.media_dengue_cem_mil_hab, yerr=estados.std_dengue_cem_mil_hab,\
-	fmt='o', markersize=10, color='#3AEF12', alpha=0.75)
+	fmt='s', markersize=10, color='#1156EB', alpha=0.7)
 xticks(x, asarray(estados.uf))
 margins(0.05)
-title('media anual de taxa de casos de dengue com barras de erro')
+title('media anual de taxa de casos de dengue')
 xlabel('estado')
 ylabel('casos de dengue/cem mil hab.')
-savefig('graficos/@error-bar-media-de-casos-de-dengue-por-estado.png')
+savefig('graficos/@error-bar-media-dengue.png')
 clf()
 
 # errorbar para casos de hemorragica
 errorbar(x, estados.media_casos_hemorragica, yerr=estados.std_casos_hemorragica,\
-	fmt='o', markersize=10, color='#3A12EF', alpha=0.75)
+	fmt='s', markersize=10, color='#A052EF', alpha=0.7)
 xticks(x, asarray(estados.uf))
 margins(0.05)
-title('media anual de casos de dengue hemorragica por estado com barras de erro')
+title('media anual de casos de dengue hemorragica')
 xlabel('estado')
 ylabel('numero de casos de dengue hemorragica')
-savefig('graficos/@error-bar-casos-de-hemorragica-por-estado.png')
+savefig('graficos/@error-bar-casos-hemorragica.png')
 clf()
 
 # errorbar para obitos hemorragica
 errorbar(x, estados.media_obitos_hemorragica, yerr=estados.std_obitos_hemorragica,\
-	fmt='o', markersize=10, color='black', alpha=0.75)
+	fmt='s', markersize=10, color='black', alpha=0.7)
 xticks(x, asarray(estados.uf))
 margins(0.05)
-title('media anual de taxa de obito devido a dengue hemorragica por estado com barras de erro')
+title('media anual de taxa de obito devido a dengue hemorragica')
 xlabel('estado')
 ylabel('taxa de obito devido a dengue hemorragica')
-savefig('graficos/@error-bar-obitos-hemorragica-por-estado.png')
+savefig('graficos/@error-bar-obitos-hemorragica.png')
 clf()
+
+# lista de anos
+q = """
+	SELECT ano, uf FROM dfDengue
+		WHERE ano >= 1994 AND ano <= 2013
+		GROUP BY ano
+	"""
+
+anos = sqldf(q, globals())
+
+# verificar tendencia de subida da taxa de casos de dengue
+for estado in estados.uf:
+	x = anos.ano
+	y = dfDengue[(dfDengue.ano >= 1994) &\
+		(dfDengue.ano <= 2013) &\
+		(dfDengue.uf == estado)].dengue_cem_mil_hab
+	x = asarray(x)
+	y = asarray(y)
+	m, b = linreg(x, y)
+	print('{}: m_dengue = {}'.format(estado, m))
+
+	y = dfDengue[(dfDengue.ano >= 1994) &\
+		(dfDengue.ano <= 2013) &\
+		(dfDengue.uf == estado)].taxa_obito_hemorragica
+	y = asarray(y)
+	m, b = linreg(x, y)
+	print('{}: m_hemorragica = {}'.format(estado, m))
+
+
+# estatisticas
