@@ -145,3 +145,9 @@ for estado in estados.uf:
 	y = asarray(y)
 	m, b = linreg(x, y)
 	print('{}: m_hemorragica = {}'.format(estado, m))
+
+# escrever dataframe para depois agrupar
+estadosToCsv = estados[['uf', 'media_medicos', 'std_medicos',\
+	'media_leitos', 'std_leitos', 'media_dengue_cem_mil_hab', 'std_dengue_cem_mil_hab',\
+	'media_obitos_hemorragica', 'std_obitos_hemorragica']]
+estadosToCsv.to_csv('dados/to-kmeans.csv', index=False)
